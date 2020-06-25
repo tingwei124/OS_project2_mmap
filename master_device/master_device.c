@@ -59,6 +59,15 @@ static struct sockaddr_in addr_cli;//address for slave
 static mm_segment_t old_fs;
 static int addr_len;
 //static  struct mmap_info *mmap_msg; // pointer to the mapped data in this device
+static int mmap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+{
+	unsigned long address = (unsigned long) vmf->virtual_address;
+	if(address > vma->vm_end)
+		printk("invalid address.\n");
+	vmf->page = virt_to_page(vma->vm_private_data);
+	get_page(vmf->page);
+	return 0;
+}
 void mmap_open(struct vm_area_struct *vma)
 {
 	/* Do nothing */
@@ -70,6 +79,7 @@ void mmap_close(struct vm_area_struct *vma)
 static const struct vm_operations_struct my_vm_ops = {
 	.open = mmap_open,
 	.close = mmap_close,
+	.fault = mmap_fault,
 };
 
 static int my_mmap(struct file *file, struct vm_area_struct *vma)
