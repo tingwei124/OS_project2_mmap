@@ -79,7 +79,6 @@ int main (int argc, char* argv[])
 			}
 			break;
 	}
-	ioctl(dev_fd, 7122); //what is this for???
 	if(ioctl(dev_fd, 0x12345679) == -1) // end sending data, close the connection
 	{
 		perror("ioclt server exits error\n");
